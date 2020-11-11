@@ -8,7 +8,7 @@ with open(os.path.join(directory, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="srenamer",
-    version="0.1.0",
+    version="0.1.1",
     description="This is a simple file renamer for TV shows and anime.",
     author="Maxim Makovskiy",
     author_email="makovskiyms@gmail.com",

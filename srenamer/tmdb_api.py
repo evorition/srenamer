@@ -1,6 +1,5 @@
-import re
-import requests
 import urllib
+import requests
 
 
 class MovieDatabase:
@@ -30,6 +29,7 @@ class MovieDatabase:
                     series_list[i]["first_air_date"],
                     "-",
                     series_list[i]["original_name"],
+                    "(" + series_list[i]["name"] + ")",
                 )
             series_choice = int(input("Enter number matching prefered TV show: "))
             series_id = series_list[series_choice]["id"]
