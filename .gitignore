@@ -140,6 +140,3 @@ cython_debug/
 # VIM swap files
 *.swp
 *.swo
-
-# files containing private information
-api_key
