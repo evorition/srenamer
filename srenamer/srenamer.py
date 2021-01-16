@@ -34,6 +34,13 @@ class ExtParamType(click.ParamType):
         return value
 
 
+def replace_illegal(s):
+    illegal = ["\\", "/", ":", "*", '"', "<", ">", "|", "?"]
+    for c in illegal:
+        s = s.replace(c, "")
+    return s
+
+
 @click.group(chain=True)
 @click.pass_context
 def cli(ctx):
@@ -56,7 +63,7 @@ def cli(ctx):
     type=click.STRING,
     help="Search query that should contain name of TV show.",
 )
-@click.option("--season", required=True, type=click.INT, help="Season number.")
+@click.option("--season", "-s", required=True, type=click.INT, help="Season number.")
 @click.pass_context
 def tmdb_api(ctx, api_key, query, season):
     tmdb.API_KEY = api_key
@@ -91,7 +98,7 @@ def tmdb_api(ctx, api_key, query, season):
     tv_season = tmdb.TV_Seasons(tv_id=id, season_number=season)
     tv_season.info()
     for episode in tv_season.episodes:
-        ctx.obj.setdefault("episodes", []).append(episode["name"])
+        ctx.obj.setdefault("episodes", []).append(replace_illegal(episode["name"]))
 
 
 @cli.command("renamer")
@@ -125,18 +132,24 @@ def renamer(ctx, path, extension):
     files_list = [file for file in next(os.walk("."))[2] if file.endswith(extension)]
 
     if files_list:
+        ext_lambda = lambda p: os.path.splitext(p)[1]
         print("All of your file will be renamed the following way:")
         for src, dst in zip(files_list, series_list):
             print(
                 os.path.join(path, src),
                 "->",
-                os.path.join(path, "".join([dst, extension])),
+                os.path.join(
+                    path, "".join([dst, extension if extension else ext_lambda(src)])
+                ),
             )
         if click.confirm("Do you want to continue?"):
             for src, dst in zip(files_list, series_list):
                 os.rename(
                     os.path.join(path, src),
-                    os.path.join(path, "".join([dst, extension])),
+                    os.path.join(
+                        path,
+                        "".join([dst, extension if extension else ext_lambda(src)]),
+                    ),
                 )
             print("Done!")
         else:
